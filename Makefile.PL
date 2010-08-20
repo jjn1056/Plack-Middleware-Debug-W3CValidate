@@ -4,6 +4,7 @@ use warnings;
 use inc::Module::Install;
 
 all_from 'lib/Plack/Middleware/Debug/W3cValidate.pm';
+repository 'git://github.com/jjn1056/Plack-Middleware-Debug-W3CValidate.git';
 
 requires 'parent';
 requires 'Plack';
