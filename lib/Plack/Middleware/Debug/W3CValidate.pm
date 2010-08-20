@@ -5,6 +5,7 @@ use 5.008;
 use strict;
 use warnings;
 use parent qw(Plack::Middleware::Debug::Base);
+
 use WebService::Validator::HTML::W3C;
 use Plack::Util::Accessor qw(validator_uri);
 
@@ -75,11 +76,7 @@ sub run {
     }
 }
 
-
-
 1;
-
-__END__
 
 =head1 NAME
 
@@ -92,7 +89,7 @@ Plack::Middleware::Debug::W3CValidate - Validate your Response Content
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug::W3CValidate';
+        enable 'Debug', panels =>['W3CValidate'];
         $app;
     };
 

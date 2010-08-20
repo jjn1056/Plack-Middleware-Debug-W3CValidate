@@ -5,7 +5,7 @@ my $app = sub {
 };
 
 builder {
-    enable 'Debug::W3CValidate';
+    enable 'Debug', panels =>['W3CValidate'];
     $app;
 };
 

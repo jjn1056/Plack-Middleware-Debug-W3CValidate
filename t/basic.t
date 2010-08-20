@@ -15,16 +15,16 @@ for my $content_type (@content_types) {
         ];
     };
     $app = builder {
-        enable 'Debug';
+        enable 'Debug', panels =>['W3CValidate'];
         $app;
     };
     test_psgi $app, sub {
         my $cb  = shift;
         my $res = $cb->(GET '/');
         is $res->code, 200, 'response status 200';
-        for my $panel (qw(Environment Response Timer Memory)) {
+        for my $panel ('W3C Validation') {
             like $res->content,
-              qr/<a href="#" title="$panel" class="plDebug${panel}\d+Panel">/,
+              qr/<a href="#" title="$panel"/,
               "HTML contains $panel panel";
         }
     };
