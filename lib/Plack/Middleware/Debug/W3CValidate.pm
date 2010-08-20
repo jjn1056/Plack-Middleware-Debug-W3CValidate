@@ -11,23 +11,28 @@ use Plack::Util::Accessor qw(validator_uri);
 
 my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
 % my $errors = shift @_;
+<style>
+    #plDebug td strong {
+        color: red;
+    }
+</style>
 <table>
     <thead>
         <tr>
             <th>Line</th>
             <th>Column</th>
             <th>Message</th>
-            <th>Details</th>
+            <th>Source</th>
         </tr>
     </thead>
     <tbody>
 % my $i = 0;
 % for my $error (@$errors) {
             <tr class="<%= ++$i % 2 ? 'plDebugOdd' : 'plDebugEven' %>">
-                <td><%= $error->line %></td>
-                <td><%= $error->col %></td>
-                <td><%= $error->msg %></td>
-                <td><%= Text::MicroTemplate::encoded_string($error->explanation) %></td>
+                <td><%= $error->{line} %></td>
+                <td><%= $error->{col} %></td>
+                <td><%= $error->{msg} %></td>
+                <td><%= Text::MicroTemplate::encoded_string($error->{source}) %></td>
             </tr>
 % }
     </tbody>
@@ -67,9 +72,27 @@ sub run {
                 $panel->nav_subtitle("Page validated.");
             } else {
                 $panel->nav_subtitle('Not valid. Error Count: '.$v->num_errors);
+
+use XML::XPath;
+my @errs;
+my $xp = XML::XPath->new(xml => $v->_content());
+my @messages = $xp->findnodes( '/env:Envelope/env:Body/m:markupvalidationresponse/m:errors/m:errorlist/m:error' );
+
+foreach my $msg ( @messages ) {
+    my $err = { 
+        line => $xp->find( './m:line', $msg )->get_node(1)->getChildNode(1)->getValue,
+        col => $xp->find( './m:col', $msg )->get_node(1)->getChildNode(1)->getValue,
+        msg => $xp->find( './m:message', $msg )->get_node(1)->getChildNode(1)->getValue,
+        source => $xp->find( './m:source', $msg )->get_node(1)->getChildNode(1)->getValue,  
+    };
+    push @errs, $err;
+}
+
                 $panel->content(sub {
-                    $self->render($table_template, $v->errors);
+                    $self->render($table_template, \@errs);
                 });
+
+
             }
         } else {
             $panel->content(sub {
