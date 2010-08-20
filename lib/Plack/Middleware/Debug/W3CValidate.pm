@@ -29,12 +29,12 @@ my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
     <tbody>
 % my $i = 0;
 % for my $error (@$errs) {
-            <tr class="<%= ++$i % 2 ? 'plDebugOdd' : 'plDebugEven' %>">
-                <td><%= $error->{line} %></td>
-                <td><%= $error->{col} %></td>
-                <td><%= $error->{msg} %></td>
-                <td><%= Text::MicroTemplate::encoded_string($error->{source}) %></td>
-            </tr>
+        <tr class="<%= ++$i % 2 ? 'plDebugOdd' : 'plDebugEven' %>">
+            <td><%= $error->{line} %></td>
+            <td><%= $error->{col} %></td>
+            <td><%= $error->{msg} %></td>
+            <td><%= Text::MicroTemplate::encoded_string($error->{source}) %></td>
+        </tr>
 % }
     </tbody>
 </table>
