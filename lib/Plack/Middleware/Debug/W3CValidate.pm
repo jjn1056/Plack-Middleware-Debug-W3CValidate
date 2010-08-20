@@ -90,6 +90,7 @@ sub run {
         if($v->validate_markup($slurped_body)) {
             if ( $v->is_valid ) {
                 $panel->nav_subtitle("Page validated.");
+                $panel->content(sub { "<h3>No Errors on Page</h3>" });
             } else {
                 $panel->nav_subtitle('Not valid. Error Count: '.$v->num_errors);
                 my @errs = $self->parse_for_errors($v->_content());
