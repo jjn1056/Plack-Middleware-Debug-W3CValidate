@@ -115,8 +115,14 @@ instead.  Please see L<WebService::Validator::HTML::W3C> for more.
 
 L<Plack::Middleware::Debug>
 
+=head1 AUTHOR
 
+John Napiorkowski, C<< <jjnapiork@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
-
 
