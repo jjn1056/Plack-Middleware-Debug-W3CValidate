@@ -9,7 +9,7 @@ use parent qw(Plack::Middleware::Debug::Base);
 use WebService::Validator::HTML::W3C;
 use Plack::Util::Accessor qw(validator_uri);
 
-my $table_template = __PACKAGE__->build_template(<<'EOTMPL');
+my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
 <table>
     <thead>
         <tr>
@@ -31,7 +31,7 @@ my $table_template = __PACKAGE__->build_template(<<'EOTMPL');
 % }
     </tbody>
 </table>
-EOTMPL
+TABLETMPL
 
 sub get_validator {
     my $self = shift @_;
@@ -67,11 +67,15 @@ sub run {
             } else {
                 $panel->nav_subtitle('Not valid. Error Count: '.$v->num_errors);
                 $panel->content(sub {
-                    $self->render($table_template, $v->errors)
+                    $self->render($table_template, $v->errors);
                 });
             }
         } else {
-            $panel->content("Failed to validate the website: ". $v->validator_error);
+            $panel->content(sub {
+                $self->render_lines([
+                    "Failed to validate the website: ". $v->validator_error,
+                ]);
+            });
         }
     }
 }
@@ -107,6 +111,9 @@ This debug panel defines the following options.
 Takes the url of the W3C validator.  Defaults to the common validator, but if
 you plan to pound this it would be polite to setup your own and point to that
 instead.  Please see L<WebService::Validator::HTML::W3C> for more.
+
+Since this panel needs to read and submit the response body to a POST service
+it will definitely increase the time it takes to load the page.
 
 =head1 SEE ALSO
 
