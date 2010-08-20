@@ -6,17 +6,18 @@ use strict;
 use warnings;
 use parent qw(Plack::Middleware::Debug::Base);
 
+use XML::XPath;
 use WebService::Validator::HTML::W3C;
 use Plack::Util::Accessor qw(validator_uri);
 
 my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
 % my $errs = shift @_;
 <style>
-    #plDebug td strong {
+    #validation_errors td strong {
         color: red;
     }
 </style>
-<table>
+<table id="validation_errors">
     <thead>
         <tr>
             <th>Line</th>
@@ -59,6 +60,25 @@ sub flatten_body {
     }
 }
 
+## Until (and if) WebService::Validator::HTML::W3C parses for source
+sub parse_for_errors {
+    my ($self, $xml) = @_;
+    my $xp = XML::XPath->new(xml => $xml);
+    my @messages = $xp->findnodes( '/env:Envelope/env:Body/m:markupvalidationresponse/m:errors/m:errorlist/m:error' );
+
+    my @errs;
+    foreach my $msg ( @messages ) {
+        my $err = { 
+            line => $xp->find( './m:line', $msg )->get_node(1)->getChildNode(1)->getValue,
+            col => $xp->find( './m:col', $msg )->get_node(1)->getChildNode(1)->getValue,
+            msg => $xp->find( './m:message', $msg )->get_node(1)->getChildNode(1)->getValue,
+            source => $xp->find( './m:source', $msg )->get_node(1)->getChildNode(1)->getValue,  
+        };
+        push @errs, $err;
+    }
+    return @errs;
+}
+
 sub run {
     my($self, $env, $panel) = @_;
     $panel->title("W3C Validation");
@@ -72,27 +92,11 @@ sub run {
                 $panel->nav_subtitle("Page validated.");
             } else {
                 $panel->nav_subtitle('Not valid. Error Count: '.$v->num_errors);
-
-use XML::XPath;
-my @errs;
-my $xp = XML::XPath->new(xml => $v->_content());
-my @messages = $xp->findnodes( '/env:Envelope/env:Body/m:markupvalidationresponse/m:errors/m:errorlist/m:error' );
-
-foreach my $msg ( @messages ) {
-    my $err = { 
-        line => $xp->find( './m:line', $msg )->get_node(1)->getChildNode(1)->getValue,
-        col => $xp->find( './m:col', $msg )->get_node(1)->getChildNode(1)->getValue,
-        msg => $xp->find( './m:message', $msg )->get_node(1)->getChildNode(1)->getValue,
-        source => $xp->find( './m:source', $msg )->get_node(1)->getChildNode(1)->getValue,  
-    };
-    push @errs, $err;
-}
-
+                my @errs = $self->parse_for_errors($v->_content());
                 $panel->content(sub {
+                    "<h3>Errors</h3>".
                     $self->render($table_template, \@errs);
                 });
-
-
             }
         } else {
             $panel->content(sub {
