@@ -10,6 +10,7 @@ use WebService::Validator::HTML::W3C;
 use Plack::Util::Accessor qw(validator_uri);
 
 my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
+% my $errors = shift @_;
 <table>
     <thead>
         <tr>
@@ -21,12 +22,12 @@ my $table_template = __PACKAGE__->build_template(<<'TABLETMPL');
     </thead>
     <tbody>
 % my $i = 0;
-% for my $info (@{$_[0]}) {
+% for my $error (@$errors) {
             <tr class="<%= ++$i % 2 ? 'plDebugOdd' : 'plDebugEven' %>">
-                <td><%= $info->line %></td>
-                <td><%= $info->col %></td>
-                <td><%= $info->msg %></td>
-                <td><%= Text::MicroTemplate::encoded_string($info->explanation) %></td>
+                <td><%= $error->line %></td>
+                <td><%= $error->col %></td>
+                <td><%= $error->msg %></td>
+                <td><%= Text::MicroTemplate::encoded_string($error->explanation) %></td>
             </tr>
 % }
     </tbody>
