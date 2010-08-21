@@ -1,6 +1,6 @@
 package Plack::Middleware::Debug::W3CValidate;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use 5.008;
 use strict;
 use warnings;
