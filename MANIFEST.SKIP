@@ -24,6 +24,7 @@ COVER.SKIP
 CPAN.SKIP
 t/000_standard__*
 Debian_CPANTS.txt
+.DS_Store
 
 # Temp, old, emacs, vim, backup files.
 ~$
