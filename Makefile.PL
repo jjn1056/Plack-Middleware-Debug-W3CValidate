@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use inc::Module::Install;
+use inc::Module::Install 1.00;
 
-all_from 'lib/Plack/Middleware/Debug/W3cValidate.pm';
+all_from 'lib/Plack/Middleware/Debug/W3CValidate.pm';
 repository 'git://github.com/jjn1056/Plack-Middleware-Debug-W3CValidate.git';
 
 requires 'parent';
