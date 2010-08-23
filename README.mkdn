@@ -9,7 +9,7 @@ Plack::Middleware::Debug::W3CValidate - Validate your Response Content
     my $app = ...; ## Build your Plack App
 
     builder {
-        enable 'Debug::W3CValidate';
+        enable 'Debug', panels =>['W3CValidate'];
         $app;
     };
 
@@ -27,6 +27,9 @@ This debug panel defines the following options.
 Takes the url of the W3C validator.  Defaults to the common validator, but if
 you plan to pound this it would be polite to setup your own and point to that
 instead.  Please see [WebService::Validator::HTML::W3C](http://search.cpan.org/perldoc?WebService::Validator::HTML::W3C) for more.
+
+Since this panel needs to read and submit the response body to a POST service
+it will definitely increase the time it takes to load the page.
 
 # SEE ALSO
 
